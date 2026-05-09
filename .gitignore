@@ -1,0 +1,30 @@
+# Credentials and secrets
+.env
+
+# Private Discord exports (contain real messages)
+history_*.json
+
+# Generated output specs (contain private project info)
+*_spec.md
+*_spec_*.md
+design_spec*.md
+design_spec*.json
+
+# Pipeline working directory (intermediate files)
+work/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Claude Code session files
+.claude/
+
+# macOS
+.DS_Store

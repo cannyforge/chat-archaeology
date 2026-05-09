@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Conversation to Knowledge — Pipeline Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --paper:    #FAF9F6;
+  --white:    #FFFFFF;
+  --ink:      #1A1A1A;
+  --muted:    #72717A;
+  --rule:     #E2E1DC;
+  --surface:  #F2F1ED;
+
+  --amber:    #C4620A;
+  --amber-bg: #FEF3E2;
+  --blue:     #1D4ED8;
+  --blue-bg:  #EFF4FF;
+  --green:    #15803D;
+  --green-bg: #F0FDF4;
+  --red:      #B91C1C;
+  --red-bg:   #FEF2F2;
+  --purple:   #6D28D9;
+  --purple-bg:#F5F3FF;
+}
+
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+.wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 72px 40px 96px;
+}
+
+/* ── HEADER ───────────────────────────────────── */
+.kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.kicker::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+h1 {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  margin-bottom: 22px;
+}
+
+.deck {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 680px;
+  margin-bottom: 40px;
+  font-style: italic;
+}
+
+/* ── KEY NUMBERS ──────────────────────────────── */
+.stat-row {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+  width: fit-content;
+  margin-bottom: 40px;
+  background: var(--white);
+}
+.stat-cell {
+  padding: 16px 28px;
+  text-align: center;
+  border-right: 1px solid var(--rule);
+}
+.stat-cell:last-child { border-right: none; }
+.stat-num {
+  display: block;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--ink);
+}
+.stat-lbl {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* ── LEGEND ───────────────────────────────────── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 14px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 56px;
+}
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.leg-pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── PHASE HEADER ─────────────────────────────── */
+.phase-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 4px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--ink);
+}
+.phase-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.phase-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--ink);
+}
+
+/* ── STAGE ROW ────────────────────────────────── */
+.stage {
+  display: grid;
+  grid-template-columns: 72px 1fr 100px;
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--rule);
+  background: var(--white);
+  transition: box-shadow .15s;
+}
+.stage:hover { box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+
+.stage-lhs {
+  padding: 16px 14px;
+  border-right: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--surface);
+}
+.stage-num {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+.badge {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.stage-content {
+  padding: 16px 20px;
+}
+.stage-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 5px;
+  line-height: 1.3;
+}
+.stage-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.stage-rhs {
+  padding: 16px 16px;
+  border-left: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.rhs-val {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.rhs-lbl {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* stage color variants */
+.s-amber { border-left-color: var(--amber); }
+.s-amber .badge { background: var(--amber-bg); color: var(--amber); }
+
+.s-blue  { border-left-color: var(--blue); }
+.s-blue  .badge { background: var(--blue-bg);  color: var(--blue);  }
+
+.s-green { border-left-color: var(--green); }
+.s-green .badge { background: var(--green-bg); color: var(--green); }
+
+.s-red   { border-left-color: var(--red); }
+.s-red   .badge { background: var(--red-bg);   color: var(--red);   }
+
+.s-purple{ border-left-color: var(--purple); }
+.s-purple .badge { background: var(--purple-bg); color: var(--purple); }
+
+/* ── CONNECTOR ────────────────────────────────── */
+.conn {
+  position: relative;
+  height: 20px;
+  margin-left: 36px; /* center under stage-lhs (72px/2) */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 20px;
+}
+.conn::before {
+  content: '';
+  position: absolute;
+  left: 35px;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: var(--rule);
+}
+.conn::after {
+  content: '↓';
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--paper);
+  padding: 0 3px;
+  z-index: 1;
+  position: absolute;
+  left: 28px;
+}
+
+/* ── HANDOFF BANNER ───────────────────────────── */
+.handoff {
+  margin: 48px 0;
+  padding: 28px 32px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 4px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+}
+.handoff-copy {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.handoff-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,.6);
+  margin-top: 6px;
+  font-style: italic;
+}
+.handoff-stat {
+  text-align: right;
+}
+.handoff-stat .big {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+.handoff-stat .label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+  margin-top: 2px;
+}
+
+/* ── INSIGHTS ─────────────────────────────────── */
+.divider {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+.insights {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 48px;
+}
+
+.icard {
+  background: var(--white);
+  padding: 20px 18px;
+  border-top: 3px solid transparent;
+}
+.icard-num {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.icard-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.icard-body {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* ── METRICS ──────────────────────────────────── */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.metric {
+  background: var(--white);
+  padding: 28px 16px;
+  text-align: center;
+}
+.mval {
+  display: block;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.mlbl {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* ── RESPONSIVE ───────────────────────────────── */
+@media (max-width: 700px) {
+  h1 { font-size: 36px; }
+  .stage { grid-template-columns: 60px 1fr; }
+  .stage-rhs { display: none; }
+  .insights, .metrics { grid-template-columns: 1fr 1fr; }
+  .handoff { grid-template-columns: 1fr; }
+  .handoff-stat { text-align: left; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="kicker">System Design · AI Memory Pipeline · 2026</div>
+<h1>From Conversation<br>to Knowledge</h1>
+<p class="deck">Six stages, two language models, and grep transform months of scattered Discord messages into a complete, conflict-aware design record — with no vector database required.</p>
+
+<!-- NUMBERS -->
+<div class="stat-row">
+  <div class="stat-cell">
+    <span class="stat-num">N</span>
+    <span class="stat-lbl">Raw messages</span>
+  </div>
+  <div class="stat-cell">
+    <span class="stat-num">~N/10</span>
+    <span class="stat-lbl">Time clusters</span>
+  </div>
+  <div class="stat-cell">
+    <span class="stat-num">~25%</span>
+    <span class="stat-lbl">Reach LLM</span>
+  </div>
+  <div class="stat-cell">
+    <span class="stat-num">1+</span>
+    <span class="stat-lbl">Specs recovered</span>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg-item"><div class="leg-pip" style="background:var(--amber)"></div>Data · File</div>
+  <div class="leg-item"><div class="leg-pip" style="background:var(--blue)"></div>LLM Call</div>
+  <div class="leg-item"><div class="leg-pip" style="background:var(--green)"></div>Grep · Free</div>
+  <div class="leg-item"><div class="leg-pip" style="background:var(--red)"></div>Conflict Detection</div>
+  <div class="leg-item"><div class="leg-pip" style="background:var(--purple)"></div>Output</div>
+</div>
+
+<!-- ─── PHASE 1 ─────────────────────────────── -->
+<div class="phase-head">
+  <span class="phase-tag">Phase 01</span>
+  <span class="phase-title">Chat Archaeology</span>
+</div>
+
+<div class="stage s-amber">
+  <div class="stage-lhs">
+    <div class="stage-num">01</div>
+    <div class="badge">Data</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Raw Discord JSON</div>
+    <div class="stage-desc">Two or more channel exports · timestamps on every entry — the full, unfiltered record</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val">N</div>
+    <div class="rhs-lbl">messages</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-amber">
+  <div class="stage-lhs">
+    <div class="stage-num">02</div>
+    <div class="badge">Data</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Message ID Deduplication</div>
+    <div class="stage-desc">Overlapping channel exports merged, sorted chronologically. No message counted twice.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val">N</div>
+    <div class="rhs-lbl">unique msgs</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-amber">
+  <div class="stage-lhs">
+    <div class="stage-num">03</div>
+    <div class="badge">Data</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Temporal Clustering</div>
+    <div class="stage-desc">A 30-minute silence between messages = a new cluster boundary. Each cluster is one coherent conversation session. Timestamps are carried forward as first-class metadata.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val">~N/10</div>
+    <div class="rhs-lbl">clusters</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-amber">
+  <div class="stage-lhs">
+    <div class="stage-num">04</div>
+    <div class="badge">Data</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Flat TSV — Grep-Ready</div>
+    <div class="stage-desc">cluster_id · timestamp · author · content — one record per line, newlines escaped. No parsing required for downstream shell tools.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val" style="font-size:14px">cluster_0000<br>→ 0092</div>
+    <div class="rhs-lbl">output files</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-blue">
+  <div class="stage-lhs">
+    <div class="stage-num">05</div>
+    <div class="badge">LLM · Haiku</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Generate Domain Search Terms</div>
+    <div class="stage-desc">One Haiku call takes the app names and descriptions, returns regex-ready term sets per topic. Runs once. The entire search phase is free from this point forward.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val">1</div>
+    <div class="rhs-lbl">LLM call<br>ever</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-green">
+  <div class="stage-lhs">
+    <div class="stage-num">06</div>
+    <div class="badge">Grep · Free</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Score All Clusters — Zero Cost</div>
+    <div class="stage-desc">Pattern-match each topic's terms against every cluster file. Clusters × topics = scored pairs matrix. No tokens spent. Shell does the work.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val" style="color:var(--green)">$0</div>
+    <div class="rhs-lbl">cost</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-green">
+  <div class="stage-lhs">
+    <div class="stage-num">07</div>
+    <div class="badge">Grep · Free</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Score Matrix → Threshold Filter</div>
+    <div class="stage-desc">Clusters with hit count ≥ 1 pass. The rest are dropped. Roughly 75% of the message corpus never reaches a language model.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val" style="color:var(--green)">75%</div>
+    <div class="rhs-lbl">filtered<br>free</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-amber">
+  <div class="stage-lhs">
+    <div class="stage-num">08</div>
+    <div class="badge">Data</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Per-Topic Text Files — Assembled</div>
+    <div class="stage-desc">Eight topic files, each containing only the clusters that scored above threshold, ranked by relevance. The raw material for extraction.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val">21</div>
+    <div class="rhs-lbl">clusters<br>proceed</div>
+  </div>
+</div>
+
+<!-- HANDOFF -->
+<div class="handoff">
+  <div>
+    <div class="handoff-copy">The grep pass is complete.<br>Now the language models take over.</div>
+    <div class="handoff-sub">Only ~25% of clusters reach an LLM — the rest were filtered at zero cost by grep.</div>
+  </div>
+  <div class="handoff-stat">
+    <div class="big">~25%</div>
+    <div class="label">LLM throughput</div>
+  </div>
+</div>
+
+<!-- ─── PHASE 2 ─────────────────────────────── -->
+<div class="phase-head">
+  <span class="phase-tag">Phase 02</span>
+  <span class="phase-title">Knowledge Reconstruction</span>
+</div>
+
+<div class="stage s-blue">
+  <div class="stage-lhs">
+    <div class="stage-num">09</div>
+    <div class="badge">LLM · Haiku</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Per-Cluster Extraction · 6 Parallel Workers</div>
+    <div class="stage-desc">Each cluster gets a targeted Haiku call. Output: decision state (proposed / debated / confirmed / reversed / deferred), topic_tags, product insight, engineering decisions, UX notes, verbatim quote, and what prior decision this cluster reverses — if any.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val">×6</div>
+    <div class="rhs-lbl">parallel<br>workers</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-green">
+  <div class="stage-lhs">
+    <div class="stage-num">10</div>
+    <div class="badge">Free</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Chronological Assembly</div>
+    <div class="stage-desc">All extractions sorted by cluster_id — which is chronological order. Later timestamps carry higher decision authority. The intellectual timeline is preserved.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val" style="color:var(--green)">$0</div>
+    <div class="rhs-lbl">cost</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-red">
+  <div class="stage-lhs">
+    <div class="stage-num">11</div>
+    <div class="badge">Conflict</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Topic Group Conflict Pass</div>
+    <div class="stage-desc">Extractions grouped by topic_tags. Any group where "confirmed" and "reversed" both appear — or where a reverses field is non-empty — triggers a targeted Haiku call to summarize the shift. Topics that evolved cleanly: zero extra cost.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val" style="color:var(--red)">100%</div>
+    <div class="rhs-lbl">reversals<br>visible</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-blue">
+  <div class="stage-lhs">
+    <div class="stage-num">12</div>
+    <div class="badge">LLM · Sonnet</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">Final Synthesis — One Sonnet Call</div>
+    <div class="stage-desc">Chronological notes + conflict summary → one 12,000-token synthesis. Output: §overview §features §architecture §data models §API §engineering decisions §QA §deferrals §decisions-that-changed §open questions.</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val">1</div>
+    <div class="rhs-lbl">Sonnet<br>call</div>
+  </div>
+</div>
+<div class="conn"></div>
+
+<div class="stage s-purple">
+  <div class="stage-lhs">
+    <div class="stage-num">13</div>
+    <div class="badge">Output</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">voice_app_spec_[timestamp].md</div>
+    <div class="stage-desc">Example: voice-based AI app · emotional tone pipeline · per-session memory architecture · real-time interaction flows</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val" style="font-size:13px; line-height:1.3">Design<br>Spec</div>
+    <div class="rhs-lbl">recovered</div>
+  </div>
+</div>
+<div class="conn" style="opacity:.4"></div>
+
+<div class="stage s-purple">
+  <div class="stage-lhs">
+    <div class="stage-num">14</div>
+    <div class="badge">Output</div>
+  </div>
+  <div class="stage-content">
+    <div class="stage-title">portfolio_app_spec_[timestamp].md</div>
+    <div class="stage-desc">Example: investment portfolio app · strategy decisions · data model · API integrations · risk and rebalancing logic</div>
+  </div>
+  <div class="stage-rhs">
+    <div class="rhs-val" style="font-size:13px; line-height:1.3">Design<br>Spec</div>
+    <div class="rhs-lbl">recovered</div>
+  </div>
+</div>
+
+<!-- INSIGHTS -->
+<div style="margin-top:64px; margin-bottom:20px">
+  <div class="divider">Key Insights</div>
+</div>
+<div class="insights">
+  <div class="icard" style="border-top-color:var(--amber)">
+    <div class="icard-num">01 · Time</div>
+    <div class="icard-title">Timestamps Preserve the Intellectual Timeline</div>
+    <div class="icard-body">Ideas have a birth, evolution, and death. Cluster ordering makes "what was decided when" a first-class fact — not a guess.</div>
+  </div>
+  <div class="icard" style="border-top-color:var(--green)">
+    <div class="icard-num">02 · Search</div>
+    <div class="icard-title">Grep Replaces the Vector Database</div>
+    <div class="icard-body">Domain regex costs nothing to run. One LLM call generates the patterns; grep does the rest free. No embedding API, no index to maintain.</div>
+  </div>
+  <div class="icard" style="border-top-color:var(--blue)">
+    <div class="icard-num">03 · States</div>
+    <div class="icard-title">Decision States Track the Idea Lifecycle</div>
+    <div class="icard-body">proposed → debated → confirmed → reversed → deferred. Each cluster tagged with where in the lifecycle a decision stood.</div>
+  </div>
+  <div class="icard" style="border-top-color:var(--red)">
+    <div class="icard-num">04 · Conflict</div>
+    <div class="icard-title">Reversals Surface Automatically</div>
+    <div class="icard-body">Same topic, different conclusions over time = detected and cited. Reversals are explicit — never silently overwritten by "latest wins."</div>
+  </div>
+  <div class="icard" style="border-top-color:var(--purple)">
+    <div class="icard-num">05 · Models</div>
+    <div class="icard-title">Haiku for Breadth, Sonnet for Depth</div>
+    <div class="icard-body">Haiku handles 21 clusters in parallel cheaply. Sonnet synthesizes once at full quality. Right model, right job, right cost.</div>
+  </div>
+</div>
+
+<!-- METRICS -->
+<div class="divider">Efficiency Profile</div>
+<div class="metrics">
+  <div class="metric">
+    <span class="mval" style="color:var(--green)">~25%</span>
+    <div class="mlbl">of messages<br>reach an LLM</div>
+  </div>
+  <div class="metric">
+    <span class="mval" style="color:var(--green)">$0</span>
+    <div class="mlbl">embedding cost<br>no vector DB</div>
+  </div>
+  <div class="metric">
+    <span class="mval" style="color:var(--blue)">×6</span>
+    <div class="mlbl">parallel Haiku<br>workers</div>
+  </div>
+  <div class="metric">
+    <span class="mval" style="color:var(--red)">100%</span>
+    <div class="mlbl">conflicts made<br>visible</div>
+  </div>
+  <div class="metric">
+    <span class="mval" style="color:var(--purple)">∞</span>
+    <div class="mlbl">any stage<br>re-runnable</div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>

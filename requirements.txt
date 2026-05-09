@@ -1,0 +1,6 @@
+discord.py>=2.3.0
+certifi
+aiohttp
+anthropic>=0.40.0
+python-dotenv
+json-repair
